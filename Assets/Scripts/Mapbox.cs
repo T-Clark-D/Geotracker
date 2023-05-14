@@ -11,9 +11,10 @@ public class Mapbox : MonoBehaviour
     public string accessToken;
     public float centerLatitude = -33.8873f;
     public float centerLongitude = 151.2189f;
-    public float zoom = 15.0f;
+    public float zoom = 17.0f;
     public int bearing = 0;
     public int pitch = 0;
+
 
     public enum style { Light, Dark, Streets, Outdoors, Satellite, SatelliteStreets };
     public style mapStyle = style.Streets;
@@ -32,7 +33,7 @@ public class Mapbox : MonoBehaviour
         rect = gameObject.GetComponent<RawImage>().rectTransform.rect; 
         mapWidth = (int)Math.Round(rect.width);
         mapHeight = (int) Math.Round(rect.height);
-        InvokeRepeating("UpdateGPSData", 0.5f, 2f);
+        InvokeRepeating("UpdateGPSData", 0.5f, 0.5f);
     }
 
     // Update is called once per frame
@@ -46,7 +47,17 @@ public class Mapbox : MonoBehaviour
 
     IEnumerator GetMapbox()
     {
-        url = "https://api.mapbox.com/styles/v1/mapbox/" + styleStr[(int)mapStyle] + "/static/" + centerLongitude + "," +centerLatitude + "," + zoom + "," + bearing + ","+ pitch + "/" +mapWidth + "x" + mapHeight + "?" + "access_token=" + accessToken;
+        if(GPSLocation.longitude != 0)
+        {
+            //bearing = GPSLocation.bearing;
+            //transform.rotation = new Quaternion(0,0, GPSLocation.bearing);
+            
+            centerLatitude = GPSLocation.latitude;
+            centerLongitude = GPSLocation.longitude;
+        }
+        
+
+        url = "https://api.mapbox.com/styles/v1/mapbox/" + styleStr[(int)mapStyle] + "/static/" + centerLongitude + "," +centerLatitude + "," + zoom + "," + 0 + ","+ pitch + "/" +mapWidth + "x" + mapHeight + "?" + "access_token=" + accessToken;
         UnityWebRequest www = UnityWebRequestTexture.GetTexture(url); 
         yield return www.SendWebRequest();
         if (www.result != UnityWebRequest.Result.Success)

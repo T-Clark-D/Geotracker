@@ -22,15 +22,15 @@ public class UIUpdater : MonoBehaviour
         LongitudeText = Longitude.GetComponent<TextMeshProUGUI>();
         LatitudeText = Latitude.GetComponent<TextMeshProUGUI>();
         GPSStatusText = GPSStatus.GetComponent<TextMeshProUGUI>();
-        GPSLocation.NewLocation += UpdateLocation;
+        //GPSLocation.NewLocation += UpdateLocation;
     } 
 
     
     void UpdateLocation()
     {
         Debug.Log("we in updatelocation");
-        LongitudeText.text = GPSLocation.longitude;
-        LatitudeText.text = GPSLocation.latitude;
-        GPSStatusText.text = GPSLocation.GPSStatus;
+        //LongitudeText.text = GPSLocation.longitude;
+        //LatitudeText.text = GPSLocation.latitude;
+       // GPSStatusText.text = GPSLocation.GPSStatus;
     }
 }

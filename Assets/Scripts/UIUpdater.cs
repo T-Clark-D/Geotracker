@@ -6,31 +6,33 @@ using UnityEngine;
 
 public class UIUpdater : MonoBehaviour
 {
-    public GameObject Longitude;
-    public GameObject Latitude;
-    public GameObject GPSStatus;
+    public GameObject Coordinates;
+    public GameObject Compass;
+    public GameObject Distance;
+    public GameObject ErrorText;
 
-    private TextMeshProUGUI LongitudeText;
-    private TextMeshProUGUI LatitudeText;
-    private TextMeshProUGUI GPSStatusText;
+    private TextMeshProUGUI CoordinatesOut;
+    private TextMeshProUGUI CompassOut;
+    private TextMeshProUGUI DistanceOut;
+    public static TextMeshProUGUI ErrorTextOut;
 
     //public GameObject GPSLocation;
     // Start is called before the first frame update
 
     private void OnEnable()
     {
-        LongitudeText = Longitude.GetComponent<TextMeshProUGUI>();
-        LatitudeText = Latitude.GetComponent<TextMeshProUGUI>();
-        GPSStatusText = GPSStatus.GetComponent<TextMeshProUGUI>();
+        CoordinatesOut = Coordinates.GetComponent<TextMeshProUGUI>();
+        CompassOut = Compass.GetComponent<TextMeshProUGUI>();
+        DistanceOut = Distance.GetComponent<TextMeshProUGUI>();
+        ErrorTextOut = ErrorText.GetComponent<TextMeshProUGUI>();
         //GPSLocation.NewLocation += UpdateLocation;
     } 
-
     
-    void UpdateLocation()
+    void FixedUpdate()
     {
-        Debug.Log("we in updatelocation");
-        //LongitudeText.text = GPSLocation.longitude;
-        //LatitudeText.text = GPSLocation.latitude;
-       // GPSStatusText.text = GPSLocation.GPSStatus;
+        CoordinatesOut.text = "Latitude: " + GPSLocation.latitude + "\nLongitude: " + GPSLocation.longitude;
+        CompassOut.text = CompassRotation.NewAngle + "°";
+        DistanceOut.text = CoordinateLogic.distance + "m";
+        //ErrorTextOut.text = GPSLocation.ErrorText;
     }
 }

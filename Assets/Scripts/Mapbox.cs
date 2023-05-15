@@ -9,8 +9,8 @@ public class Mapbox : MonoBehaviour
 {
 
     public string accessToken;
-    public static float centerLatitude = 45.49224f;
-    public static float centerLongitude = -73.56439f;
+    //public static float centerLatitude;
+    //public static float centerLongitude;
     public float zoom = 17.0f;
     public int bearing = 0;
     public int pitch = 0;
@@ -32,7 +32,7 @@ public class Mapbox : MonoBehaviour
         rect = gameObject.GetComponent<RawImage>().rectTransform.rect; 
         mapWidth = (int)Math.Round(rect.width);
         mapHeight = (int) Math.Round(rect.height);
-        InvokeRepeating("UpdateGPSData", 0.5f, 0.5f);
+        InvokeRepeating("UpdateGPSData", 0.5f, 1f);
     }
 
     // Update is called once per frame
@@ -42,22 +42,11 @@ public class Mapbox : MonoBehaviour
         mapWidth = (int)Math.Round(rect.width);
         mapHeight = (int)Math.Round(rect.height);
         StartCoroutine(GetMapbox());
-        //generates point if not generated allready
-        if(CoordinateLogic.isGenerated == false)
-        {
-            CoordinateLogic.GeneratePointOfInterestInrange(200);
-        }
     }
 
     IEnumerator GetMapbox()
     {
-        if(GPSLocation.longitude != 0)
-        { 
-            centerLatitude = GPSLocation.latitude;
-            centerLongitude = GPSLocation.longitude;
-        }
-
-        url = "https://api.mapbox.com/styles/v1/mapbox/" + styleStr[(int)mapStyle] + "/static/"+ "pin-l+ff0000("+CoordinateLogic.generatedLongitude+","+CoordinateLogic.generatedLatitude+")/"+ centerLongitude + "," +centerLatitude + "," + zoom + "," + 0 + ","+ pitch + "/" +mapWidth + "x" + mapHeight + "?" + "access_token=" + accessToken;
+        url = "https://api.mapbox.com/styles/v1/mapbox/" + styleStr[(int)mapStyle] + "/static/"+ "pin-l+ff0000("+CoordinateLogic.generatedLongitude+","+CoordinateLogic.generatedLatitude+")/"+ GPSLocation.longitude + "," + GPSLocation.latitude + "," + zoom + "," + 0 + ","+ pitch + "/" +mapWidth + "x" + mapHeight + "?" + "access_token=" + accessToken;
         UnityWebRequest www = UnityWebRequestTexture.GetTexture(url); 
         yield return www.SendWebRequest();
         if (www.result != UnityWebRequest.Result.Success)

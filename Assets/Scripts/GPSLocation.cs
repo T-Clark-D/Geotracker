@@ -8,16 +8,11 @@ public class GPSLocation : MonoBehaviour
 {
     public static float longitude;
     public static float latitude;
-    //public static int bearing;
-    public GameObject gpsText;
-    private TextMeshProUGUI gpsOut;
+    private bool isInitialised = false;
+    static int count = 0;
+
     public bool isUpdating;
 
-    private void Start()
-    {
-        gpsOut = gpsText.GetComponent<TextMeshProUGUI>();
-        gpsOut.text = "default";
-    }
     private void Update()
     {
         if (!isUpdating)
@@ -38,7 +33,11 @@ public class GPSLocation : MonoBehaviour
             yield return new WaitForSeconds(10);
 
         // Start service before querying location
-        Input.location.Start();
+        if (!isInitialised)
+        {
+            Input.location.Start();
+        }
+       
 
         // Wait until service initializes
         int maxWait = 10;
@@ -51,7 +50,7 @@ public class GPSLocation : MonoBehaviour
         // Service didn't initialize in 20 seconds
         if (maxWait <1)
         {
-            gpsOut.text = "Timed out";
+         //   gpsOut.text = "Timed out";
             print("Timed out");
             yield break;
         }
@@ -59,7 +58,7 @@ public class GPSLocation : MonoBehaviour
         // Connection has failed
         if (Input.location.status == LocationServiceStatus.Failed)
         {
-            gpsOut.text = "Unable to determine device location";
+         //   gpsOut.text = "Unable to determine device location";
             print("Unable to determine device location");
             yield break;
         }
@@ -67,16 +66,17 @@ public class GPSLocation : MonoBehaviour
         {
             longitude = Input.location.lastData.longitude;
             latitude = Input.location.lastData.latitude;
-
-            gpsOut.text = "Latitude: " + latitude + "\nLongitude: " + longitude;
-            // Access granted and location value could be retrieved
-            print("Location: " + latitude + " " + longitude + " " + Input.location.lastData.altitude + " " + Input.location.lastData.horizontalAccuracy + " " + Input.location.lastData.timestamp);
-            longitude = Input.location.lastData.longitude;
-            latitude = Input.location.lastData.latitude;
+            count++;
+            //UIUpdater.ErrorTextOut.text = count.ToString();
+            if (!isInitialised)
+            {
+                GameManager.Instance.UpdateGameStates(GameManager.GameState.InitilisatingMap);
+                isInitialised = true;
+            }
         }
 
         // Stop service if there is no need to query location updates continuously
         isUpdating = !isUpdating;
-        Input.location.Stop();
+        //Input.location.Stop();
     }
 }

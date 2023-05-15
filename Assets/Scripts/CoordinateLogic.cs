@@ -6,7 +6,8 @@ public class CoordinateLogic : MonoBehaviour
 {
     public static float generatedLongitude;
     public static float generatedLatitude;
-    public static bool isGenerated = false;
+    public static float distance;
+    public static float angle = 0;
     // Start is called before the first frame update
 
     public static void GeneratePointOfInterestInrange(int range)
@@ -15,22 +16,37 @@ public class CoordinateLogic : MonoBehaviour
         float longitudeMeters = range * Mathf.Sin(direction_degree);
         float latitudeMeters = range * Mathf.Cos(direction_degree);
         float latcoef = latitudeMeters / 111320.0f;
-        float longcoef = longitudeMeters / (111320.0f * Mathf.Cos(Mapbox.centerLatitude * (Mathf.PI / 180)));
+        float longcoef = longitudeMeters / (111320.0f * Mathf.Cos(GPSLocation.latitude * (Mathf.PI / 180)));
         //Debug.Log(coef);
-        generatedLatitude = Mapbox.centerLatitude + latcoef;
-        generatedLongitude = Mapbox.centerLongitude + longcoef;
+        generatedLatitude = GPSLocation.latitude + latcoef;
+        generatedLongitude = GPSLocation.longitude + longcoef;
         Debug.Log(generatedLatitude + " : " + generatedLongitude);
-        My_Calculate_Distance();
-        isGenerated = true;
     }
 
-    public static void My_Calculate_Distance()
+    public static void CalculateDistance()
     {
-        float latdegrees = Mathf.Abs(Mapbox.centerLatitude - generatedLatitude);
-        float longdegrees = Mathf.Abs(Mapbox.centerLongitude - generatedLongitude);
+        float latdegrees = Mathf.Abs(GPSLocation.latitude - generatedLatitude);
+        float longdegrees = Mathf.Abs(GPSLocation.longitude - generatedLongitude);
         float latmeters = latdegrees * 111320.0f;
-        float longmeters = longdegrees * (111320.0f * Mathf.Cos(Mapbox.centerLatitude * (Mathf.PI / 180)));
-        float distance = Mathf.Sqrt(Mathf.Pow(latmeters, 2) + Mathf.Pow(longmeters, 2));
-        print(distance);
+        float longmeters = longdegrees * (111320.0f * Mathf.Cos(GPSLocation.latitude * (Mathf.PI / 180)));
+        distance = Mathf.Sqrt(Mathf.Pow(latmeters, 2) + Mathf.Pow(longmeters, 2));
+        
+        if (generatedLongitude - GPSLocation.longitude >= 0 && generatedLatitude - GPSLocation.latitude > 0) //First Quadrant
+        {
+            //soh cah toa
+            angle = Mathf.Atan(longmeters / latmeters) * Mathf.Rad2Deg;
+        }
+        else if(generatedLongitude - GPSLocation.longitude > 0 && generatedLatitude - GPSLocation.latitude  <= 0) //Second Quadrant
+        {
+            angle = Mathf.Atan(latmeters / longmeters) * Mathf.Rad2Deg + 90;
+        }
+        else if(generatedLongitude - GPSLocation.longitude <= 0 && generatedLatitude - GPSLocation.latitude < 0) //Third Quadrant
+        {
+            angle = Mathf.Atan(longmeters / latmeters) * Mathf.Rad2Deg + 180;
+        }
+        else if(generatedLongitude - GPSLocation.longitude < 0 && generatedLatitude - GPSLocation.latitude >= 0) //Fourth Quadrant
+        {
+            angle = Mathf.Atan(latmeters / longmeters) * Mathf.Rad2Deg + 270;
+        }
     }
 }

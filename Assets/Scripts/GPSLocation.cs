@@ -8,7 +8,7 @@ public class GPSLocation : MonoBehaviour
 {
     public static float longitude;
     public static float latitude;
-    public static int bearing;
+    //public static int bearing;
     public GameObject gpsText;
     private TextMeshProUGUI gpsOut;
     public bool isUpdating;
@@ -68,7 +68,7 @@ public class GPSLocation : MonoBehaviour
             longitude = Input.location.lastData.longitude;
             latitude = Input.location.lastData.latitude;
 
-            gpsOut.text = "Location: " + latitude + " " + longitude + " " + Input.location.lastData.altitude + 100f + " " + Input.location.lastData.horizontalAccuracy + " " + Input.location.lastData.timestamp + " " + bearing;
+            gpsOut.text = "Latitude: " + latitude + "\nLongitude: " + longitude;
             // Access granted and location value could be retrieved
             print("Location: " + latitude + " " + longitude + " " + Input.location.lastData.altitude + " " + Input.location.lastData.horizontalAccuracy + " " + Input.location.lastData.timestamp);
             longitude = Input.location.lastData.longitude;
@@ -76,7 +76,6 @@ public class GPSLocation : MonoBehaviour
         }
 
         // Stop service if there is no need to query location updates continuously
-        
         isUpdating = !isUpdating;
         Input.location.Stop();
     }

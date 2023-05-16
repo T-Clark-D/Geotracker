@@ -55,7 +55,7 @@ public class Mapbox : MonoBehaviour
 
     IEnumerator GetMapbox()
     {
-        url = "https://api.mapbox.com/styles/v1/mapbox/" + styleStr[(int)mapStyle] + "/static/"+ "pin-l+ff0000("+CoordinateLogic.generatedLongitude+","+CoordinateLogic.generatedLatitude+")/"+ newLongitude + "," + newLatitude + "," + zoom + "," + 0 + ","+ pitch + "/" +mapWidth + "x" + mapHeight + "?" + "access_token=" + accessToken;
+        url = "https://api.mapbox.com/styles/v1" + "/chaotic-clark/clhpkdq5y01h301p68v7fadhf"/*styleStr[(int)mapStyle]*/ + "/static/"+ "pin-l+ff0000("+CoordinateLogic.generatedLongitude+","+CoordinateLogic.generatedLatitude+")/"+ newLongitude + "," + newLatitude + "," + zoom + "," + 0 + ","+ pitch + "/" +mapWidth + "x" + mapHeight + "?" + "access_token=" + accessToken;
         UnityWebRequest www = UnityWebRequestTexture.GetTexture(url); 
         yield return www.SendWebRequest();
         if (www.result != UnityWebRequest.Result.Success)

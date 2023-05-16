@@ -19,8 +19,9 @@ public class Mapbox : MonoBehaviour
     public enum resolution { low = 1, high = 2 };
     public resolution mapResolution = resolution.high;
 
-    private float currentLatitude;
-    private float currentLongitude;
+    private float pointLatitude;
+    private float pointLongitude;
+    
     private float newLatitude;
     private float newLongitude;
 
@@ -30,33 +31,42 @@ public class Mapbox : MonoBehaviour
     private Rect rect;
 
     // Start is called before the first frame update
+    private void Awake()
+    {
+        GPSLocation.CoordinatesUpdated += UpdateGPSData;
+        CoordinateLogic.PointOfInterestGenerated += UpdatePointOfInterest;
+    }
+
+    private void OnDestroy()
+    {
+        GPSLocation.CoordinatesUpdated -= UpdateGPSData;
+        CoordinateLogic.PointOfInterestGenerated -= UpdatePointOfInterest;
+    }
+
     void Start()
     {
         rect = gameObject.GetComponent<RawImage>().rectTransform.rect; 
         mapWidth = (int)Math.Round(rect.width);
         mapHeight = (int) Math.Round(rect.height);
-        //I have a limited amount of api calls i'm scared of putting in a loop that runs every second even though I'm only updating it when the coordinates change
-        InvokeRepeating("UpdateGPSData", 0.5f, 1f);
+    }
+    private void UpdatePointOfInterest(float genLongitude, float genLatitude)
+    {
+        pointLatitude = genLatitude;
+        pointLongitude = genLongitude;
+        StartCoroutine(GetMapbox());
     }
 
-    // Update is called once per frame
-    void UpdateGPSData()
+    void UpdateGPSData(float longitude, float latitude)
     {
-        newLatitude = GPSLocation.latitude;
-        newLongitude = GPSLocation.longitude;
-        //only update from api if longitude has changed
-        if (newLatitude != currentLatitude || newLongitude != currentLongitude)
-        {
-            StartCoroutine(GetMapbox());
-            currentLatitude = newLatitude;
-            currentLongitude = newLongitude;
-        }
+        newLongitude = longitude;
+        newLatitude = latitude;
+        StartCoroutine(GetMapbox());
     }
 
     IEnumerator GetMapbox()
     {
-        url = "https://api.mapbox.com/styles/v1" + "/chaotic-clark/clhpkdq5y01h301p68v7fadhf"/*styleStr[(int)mapStyle]*/ + "/static/"+ "pin-l+ff0000("+CoordinateLogic.generatedLongitude+","+CoordinateLogic.generatedLatitude+")/"+ newLongitude + "," + newLatitude + "," + zoom + "," + 0 + ","+ pitch + "/" +mapWidth + "x" + mapHeight + "?" + "access_token=" + accessToken;
-        UnityWebRequest www = UnityWebRequestTexture.GetTexture(url); 
+        url = "https://api.mapbox.com/styles/v1" + "/chaotic-clark/clhpkdq5y01h301p68v7fadhf" + "/static/"+ "pin-l+ff0000("+ pointLongitude + ","+ pointLatitude + ")/"+ newLongitude + "," + newLatitude + "," + zoom + "," + 0 + ","+ pitch + "/" +mapWidth + "x" + mapHeight + "?" + "access_token=" + accessToken;
+        UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
         yield return www.SendWebRequest();
         if (www.result != UnityWebRequest.Result.Success)
         {

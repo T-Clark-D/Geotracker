@@ -3,12 +3,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Android;
 using TMPro;
+using System;
 
 public class GPSLocation : MonoBehaviour
 {
-    public static float longitude;
-    public static float latitude;
+    private float longitude;
+    private float latitude;
+    private float lastLatitude;
+    private float lastLongitude;
     private bool isInitialised = false;
+
+    public static event Action<float,float> CoordinatesUpdated;
 
     public bool isUpdating;
 
@@ -24,6 +29,7 @@ public class GPSLocation : MonoBehaviour
     //checks for permission then retreives location
     IEnumerator GetLocation()
     {
+ 
         if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
         {
             Permission.RequestUserPermission(Permission.FineLocation);
@@ -31,7 +37,7 @@ public class GPSLocation : MonoBehaviour
         }
         // First, check if user has location service enabled
         if (!Input.location.isEnabledByUser)
-            yield return new WaitForSeconds(10);
+            yield return new WaitForSeconds(0.5f);
 
         // Start service before querying location
         if (!isInitialised)
@@ -65,12 +71,20 @@ public class GPSLocation : MonoBehaviour
         {
             longitude = Input.location.lastData.longitude;
             latitude = Input.location.lastData.latitude;
+            //invokes coordinate update if the new coordinates are different
+            if(latitude!=lastLatitude || longitude != lastLongitude)
+            {
+                CoordinatesUpdated?.Invoke(longitude, latitude);
+                lastLatitude = latitude;
+                lastLongitude = longitude;
+            }
             //changes the games state after the first run of the coroutine
             if (!isInitialised)
             {
-                GameManager.Instance.UpdateGameStates(GameManager.GameState.InitilisatingMap);
+                //GameManager.Instance.UpdateGameStates(GameManager.GameState.InitilisatingMap);
                 isInitialised = true;
             }
+            
         }
         isUpdating = !isUpdating;
     }

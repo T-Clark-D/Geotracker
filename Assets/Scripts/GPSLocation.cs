@@ -9,7 +9,6 @@ public class GPSLocation : MonoBehaviour
     public static float longitude;
     public static float latitude;
     private bool isInitialised = false;
-    static int count = 0;
 
     public bool isUpdating;
 
@@ -21,6 +20,8 @@ public class GPSLocation : MonoBehaviour
             isUpdating = !isUpdating;
         }
     }
+
+    //checks for permission then retreives location
     IEnumerator GetLocation()
     {
         if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
@@ -50,7 +51,6 @@ public class GPSLocation : MonoBehaviour
         // Service didn't initialize in 20 seconds
         if (maxWait <1)
         {
-         //   gpsOut.text = "Timed out";
             print("Timed out");
             yield break;
         }
@@ -58,7 +58,6 @@ public class GPSLocation : MonoBehaviour
         // Connection has failed
         if (Input.location.status == LocationServiceStatus.Failed)
         {
-         //   gpsOut.text = "Unable to determine device location";
             print("Unable to determine device location");
             yield break;
         }
@@ -66,17 +65,13 @@ public class GPSLocation : MonoBehaviour
         {
             longitude = Input.location.lastData.longitude;
             latitude = Input.location.lastData.latitude;
-            count++;
-            //UIUpdater.ErrorTextOut.text = count.ToString();
+            //changes the games state after the first run of the coroutine
             if (!isInitialised)
             {
                 GameManager.Instance.UpdateGameStates(GameManager.GameState.InitilisatingMap);
                 isInitialised = true;
             }
         }
-
-        // Stop service if there is no need to query location updates continuously
         isUpdating = !isUpdating;
-        //Input.location.Stop();
     }
 }

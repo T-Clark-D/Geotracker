@@ -53,8 +53,11 @@ public class Mapbox : MonoBehaviour
     {
         pointLatitude = genLatitude;
         pointLongitude = genLongitude;
+        StopAllCoroutines();
         StartCoroutine(GetMapbox());
     }
+
+
 
     void UpdateGPSData(float longitude, float latitude)
     {
